@@ -8,19 +8,37 @@ let package = Package(
         .macOS(.v12)
     ],
     products: [
-        .executable(name: "dev-manager", targets: ["DevManagement"])
+        .executable(name: "dev-manager-cli", targets: ["DevManagementCLI"]),
+        .executable(name: "dev-manager", targets: ["DevManagementGUI"])
     ],
     dependencies: [
     ],
     targets: [
-        .executableTarget(
-            name: "DevManagement",
+        // Shared core module for CLI and GUI
+        .target(
+            name: "DevManagementCore",
             dependencies: [],
-            path: "Sources"
+            path: "Sources/Core"
         ),
+
+        // CLI target (existing functionality)
+        .executableTarget(
+            name: "DevManagementCLI",
+            dependencies: ["DevManagementCore"],
+            path: "Sources/CLI"
+        ),
+
+        // GUI target (new MenuBarExtra application)
+        .executableTarget(
+            name: "DevManagementGUI",
+            dependencies: ["DevManagementCore"],
+            path: "Sources/GUI"
+        ),
+
+        // Tests
         .testTarget(
             name: "DevManagementTests",
-            dependencies: ["DevManagement"],
+            dependencies: ["DevManagementCore"],
             path: "Tests"
         )
     ]

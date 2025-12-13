@@ -76,44 +76,79 @@ struct DevManagement {
 
     static func handleStatus(services: [Service]) throws {
         print("\n🔍 Service Status Report\n")
+        let serviceManager = ServiceManager()
+
         for service in services {
-            let statusSymbol = "❓"  // Placeholder - Phase 3 will implement actual checks
-            print("  \(statusSymbol) \(service.displayName)")
+            let status = try serviceManager.getStatus(for: service)
+            print("  \(status.icon) \(service.displayName) - \(status.description)")
         }
         print()
     }
 
     static func handleStart(services: [Service], serviceName: String?) throws {
-        if let name = serviceName {
-            print("Starting service: \(name)")
-            // Phase 2 will implement actual start logic
-        } else {
-            print("Please specify a service name")
+        guard let name = serviceName else {
+            print("❌ Please specify a service name")
+            print("\nAvailable services:")
+            for service in services {
+                print("  - \(service.name)")
+            }
+            exit(1)
         }
+
+        guard let service = services.first(where: { $0.name == name }) else {
+            print("❌ Service not found: \(name)")
+            exit(1)
+        }
+
+        let serviceManager = ServiceManager()
+        try serviceManager.start(service: service)
     }
 
     static func handleStop(services: [Service], serviceName: String?) throws {
-        if let name = serviceName {
-            print("Stopping service: \(name)")
-            // Phase 2 will implement actual stop logic
-        } else {
-            print("Please specify a service name")
+        guard let name = serviceName else {
+            print("❌ Please specify a service name")
+            print("\nAvailable services:")
+            for service in services {
+                print("  - \(service.name)")
+            }
+            exit(1)
         }
+
+        guard let service = services.first(where: { $0.name == name }) else {
+            print("❌ Service not found: \(name)")
+            exit(1)
+        }
+
+        let serviceManager = ServiceManager()
+        try serviceManager.stop(service: service)
     }
 
     static func handleRestart(services: [Service], serviceName: String?) throws {
-        if let name = serviceName {
-            print("Restarting service: \(name)")
-            // Phase 2 will implement actual restart logic
-        } else {
-            print("Please specify a service name")
+        guard let name = serviceName else {
+            print("❌ Please specify a service name")
+            print("\nAvailable services:")
+            for service in services {
+                print("  - \(service.name)")
+            }
+            exit(1)
         }
+
+        guard let service = services.first(where: { $0.name == name }) else {
+            print("❌ Service not found: \(name)")
+            exit(1)
+        }
+
+        let serviceManager = ServiceManager()
+        try serviceManager.restart(service: service)
     }
 
     static func handleHealthCheck(services: [Service]) throws {
         print("\n🏥 Health Check Status\n")
+        let serviceManager = ServiceManager()
+
         for service in services {
-            print("  ❓ \(service.displayName)")
+            let status = try serviceManager.checkHealth(for: service)
+            print("  \(status.icon) \(service.displayName) - \(status.description)")
         }
         print()
     }
@@ -308,4 +343,189 @@ struct FutureService: Codable {
         case description
         case estimatedPhase = "estimated_phase"
     }
+}
+
+// MARK: - Service Manager (Phase 2)
+
+class ServiceManager {
+    func getStatus(for service: Service) throws -> ServiceStatus {
+        // For process type services (Colima), check with command
+        if service.type == "process" {
+            return try checkProcessStatus(service)
+        }
+
+        // For HTTP services, check health endpoint
+        if service.type == "http" {
+            return try checkHttpStatus(service)
+        }
+
+        return ServiceStatus(icon: "❓", description: "Unknown status")
+    }
+
+    func checkHealth(for service: Service) throws -> ServiceStatus {
+        return try getStatus(for: service)
+    }
+
+    func start(service: Service) throws {
+        print("\n🚀 Starting \(service.displayName)...")
+
+        let process = Process()
+        process.launchPath = "/bin/bash"
+        process.arguments = ["-c", service.commands.start]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+
+            if process.terminationStatus == 0 {
+                print("✅ \(service.displayName) started successfully")
+            } else {
+                print("❌ \(service.displayName) startup failed (exit code: \(process.terminationStatus))")
+                exit(1)
+            }
+        } catch {
+            print("❌ Failed to start \(service.displayName): \(error)")
+            exit(1)
+        }
+    }
+
+    func stop(service: Service) throws {
+        print("\n⛔ Stopping \(service.displayName)...")
+
+        let process = Process()
+        process.launchPath = "/bin/bash"
+        process.arguments = ["-c", service.commands.stop]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+
+            if process.terminationStatus == 0 {
+                print("✅ \(service.displayName) stopped")
+            } else {
+                print("⚠️  \(service.displayName) stop returned exit code: \(process.terminationStatus)")
+            }
+        } catch {
+            print("❌ Failed to stop \(service.displayName): \(error)")
+            exit(1)
+        }
+    }
+
+    func restart(service: Service) throws {
+        print("\n🔄 Restarting \(service.displayName)...")
+
+        let process = Process()
+        process.launchPath = "/bin/bash"
+        process.arguments = ["-c", service.commands.restart]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+
+            if process.terminationStatus == 0 {
+                print("✅ \(service.displayName) restarted successfully")
+            } else {
+                print("❌ \(service.displayName) restart failed (exit code: \(process.terminationStatus))")
+                exit(1)
+            }
+        } catch {
+            print("❌ Failed to restart \(service.displayName): \(error)")
+            exit(1)
+        }
+    }
+
+    // MARK: - Status Checking
+
+    private func checkProcessStatus(_ service: Service) throws -> ServiceStatus {
+        let process = Process()
+        process.launchPath = "/bin/bash"
+        process.arguments = ["-c", service.commands.status ?? "true"]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+
+            if process.terminationStatus == 0 {
+                return ServiceStatus(icon: "🟢", description: "Running")
+            } else {
+                return ServiceStatus(icon: "🔴", description: "Stopped")
+            }
+        } catch {
+            return ServiceStatus(icon: "🔴", description: "Status check failed")
+        }
+    }
+
+    private func checkHttpStatus(_ service: Service) throws -> ServiceStatus {
+        guard let healthCheck = service.healthCheck,
+              let endpoints = healthCheck.endpoints,
+              !endpoints.isEmpty else {
+            return ServiceStatus(icon: "❓", description: "No health check configured")
+        }
+
+        for endpoint in endpoints {
+            if let status = try checkHttpEndpoint(endpoint) {
+                return status
+            }
+        }
+
+        return ServiceStatus(icon: "🔴", description: "Health check failed")
+    }
+
+    private func checkHttpEndpoint(_ endpoint: HealthCheckEndpoint) throws -> ServiceStatus? {
+        let urlString = endpoint.url
+        guard let url = URL(string: urlString) else {
+            return nil
+        }
+
+        let request = URLRequest(url: url)
+        let session = URLSession(configuration: .default)
+
+        var resultStatus: ServiceStatus? = nil
+        let semaphore = DispatchSemaphore(value: 0)
+
+        let task = session.dataTask(with: request) { _, response, _ in
+            if let httpResponse = response as? HTTPURLResponse {
+                let expectedCodes = endpoint.expectedStatusCodes ?? [200]
+                if expectedCodes.contains(httpResponse.statusCode) {
+                    resultStatus = ServiceStatus(icon: "🟢", description: "Healthy")
+                } else {
+                    resultStatus = ServiceStatus(icon: "🟠", description: "HTTP \(httpResponse.statusCode)")
+                }
+            }
+            semaphore.signal()
+        }
+
+        task.resume()
+
+        // Wait up to 5 seconds for response
+        let deadline = DispatchTime.now() + .seconds(5)
+        if semaphore.wait(timeout: deadline) == .timedOut {
+            return ServiceStatus(icon: "🔴", description: "Health check timeout")
+        }
+
+        return resultStatus
+    }
+}
+
+// MARK: - Service Status
+
+struct ServiceStatus {
+    let icon: String
+    let description: String
 }

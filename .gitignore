@@ -1,0 +1,52 @@
+# Xcode
+.DS_Store
+.swiftpm/
+.build/
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+*.pbxuser
+*.perspectivev3
+build/
+DerivedData/
+
+# Swift Package Manager
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+.build/
+release/
+
+# Runtime
+*.app/
+*.pid
+
+# Test artifacts
+test-results/
+playwright-report/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Node (for any web tools)
+node_modules/

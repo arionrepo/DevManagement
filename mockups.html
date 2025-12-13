@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevManagement UI Mockups</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .mockup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .mockup-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .mockup-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .mockup-content {
+            padding: 0;
+        }
+
+        /* Compact Vertical Design */
+        .compact-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            background: #fafafa;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .compact-header-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .service-row {
+            padding: 10px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.2s;
+        }
+
+        .service-row:hover {
+            background: #f9f9f9;
+        }
+
+        .service-row:last-child {
+            border-bottom: none;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-indicator.green {
+            background: #34c759;
+        }
+
+        .status-indicator.orange {
+            background: #ff9500;
+        }
+
+        .status-indicator.red {
+            background: #ff3b30;
+        }
+
+        .status-indicator.gray {
+            background: #d0d0d0;
+        }
+
+        .service-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .service-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .service-status {
+            font-size: 11px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .service-controls {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .control-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .control-btn:disabled {
+            color: #ccc;
+            cursor: default;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            border-top: 1px solid #f0f0f0;
+            background: #fafafa;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+            font-size: 10px;
+            color: #999;
+        }
+
+        .settings-link {
+            color: #667eea;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Cards Design */
+        .card {
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #fafafa;
+            transition: all 0.2s;
+        }
+
+        .card:hover {
+            background: white;
+            border-color: #667eea;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            flex: 1;
+        }
+
+        .card-description {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .card-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 11px;
+        }
+
+        .card-detail-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .card-detail-label {
+            color: #999;
+        }
+
+        .card-detail-value {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .card-controls {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .card-btn {
+            flex: 1;
+            padding: 6px 8px;
+            border: none;
+            background: white;
+            color: #667eea;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 500;
+            border: 1px solid #e0e0e0;
+            transition: all 0.2s;
+        }
+
+        .card-btn:hover {
+            border-color: #667eea;
+            background: #f5f7ff;
+        }
+
+        .cards-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            background: #fafafa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cards-header-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .cards-actions {
+            padding: 12px 16px;
+            border-top: 1px solid #f0f0f0;
+            background: #fafafa;
+            display: flex;
+            gap: 8px;
+        }
+
+        .cards-actions button {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .cards-actions button:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Tabs Design */
+        .tabbed-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 1px;
+            background: #f0f0f0;
+            padding: 0 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-button:hover {
+            color: #333;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            padding: 16px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .status-box {
+            background: #fafafa;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .status-box-indicator {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .status-box-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-box-value {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .stats-section {
+            background: #fafafa;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+
+        .stats-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .logs-list {
+            background: #fafafa;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            padding: 0;
+            margin-top: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 11px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            color: #666;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-entry.info {
+            color: #666;
+        }
+
+        .log-entry.warning {
+            color: #ff9500;
+        }
+
+        .log-entry.error {
+            color: #ff3b30;
+        }
+
+        .settings-group {
+            margin-bottom: 16px;
+        }
+
+        .settings-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 12px;
+        }
+
+        .checkbox {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .select-input {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 6px 8px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 12px;
+        }
+
+        .comparison-table th {
+            background: #f9f9f9;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .comparison-table tr:hover {
+            background: #fafafa;
+        }
+
+        .check {
+            color: #34c759;
+            font-weight: bold;
+        }
+
+        .cross {
+            color: #ff3b30;
+            font-weight: bold;
+        }
+
+        .warning {
+            color: #ff9500;
+            font-weight: bold;
+        }
+
+        .menu-width-note {
+            background: #fff3cd;
+            padding: 12px 16px;
+            border-left: 4px solid #ffc107;
+            margin-top: 20px;
+            font-size: 11px;
+            color: #856404;
+            border-radius: 4px;
+        }
+
+        .responsive-hint {
+            background: #e7f3ff;
+            padding: 12px 16px;
+            border-left: 4px solid #2196F3;
+            margin-top: 20px;
+            font-size: 11px;
+            color: #0c5aa0;
+            border-radius: 4px;
+        }
+
+        .recommendation {
+            background: #d4edda;
+            padding: 12px 16px;
+            border-left: 4px solid #28a745;
+            margin-top: 20px;
+            font-size: 11px;
+            color: #155724;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .mockup-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .designer-note {
+            background: #f5f5f5;
+            padding: 12px;
+            margin-top: 16px;
+            font-size: 11px;
+            color: #666;
+            border-left: 3px solid #667eea;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DevManagement - Interactive UI Mockups</h1>
+
+        <div class="mockup-grid">
+            <!-- DESIGN 1: Compact Vertical -->
+            <div class="mockup-section">
+                <div class="mockup-header">
+                    Design 1: Compact Vertical (Recommended for MVP)
+                </div>
+                <div class="mockup-content">
+                    <div class="compact-header">
+                        <div class="compact-header-title">
+                            ⚙️ Development Services
+                        </div>
+                        <button class="refresh-btn">↻</button>
+                    </div>
+
+                    <div class="service-row">
+                        <div class="status-indicator green"></div>
+                        <div class="service-info">
+                            <div class="service-name">Colima (Docker)</div>
+                            <div class="service-status">Running • 0ms latency</div>
+                        </div>
+                        <div class="service-controls">
+                            <button class="control-btn" disabled>▶</button>
+                            <button class="control-btn">⟳</button>
+                            <button class="control-btn">⊗</button>
+                        </div>
+                    </div>
+
+                    <div class="service-row">
+                        <div class="status-indicator green"></div>
+                        <div class="service-info">
+                            <div class="service-name">Supabase</div>
+                            <div class="service-status">Healthy • 45ms latency</div>
+                        </div>
+                        <div class="service-controls">
+                            <button class="control-btn" disabled>▶</button>
+                            <button class="control-btn">⟳</button>
+                            <button class="control-btn">⊗</button>
+                        </div>
+                    </div>
+
+                    <div class="service-row">
+                        <div class="status-indicator green"></div>
+                        <div class="service-info">
+                            <div class="service-name">Python Backend</div>
+                            <div class="service-status">Running • 12ms latency</div>
+                        </div>
+                        <div class="service-controls">
+                            <button class="control-btn" disabled>▶</button>
+                            <button class="control-btn">⟳</button>
+                            <button class="control-btn">⊗</button>
+                        </div>
+                    </div>
+
+                    <div class="service-row">
+                        <div class="status-indicator orange"></div>
+                        <div class="service-info">
+                            <div class="service-name">Customer UI</div>
+                            <div class="service-status">Stopped • offline</div>
+                        </div>
+                        <div class="service-controls">
+                            <button class="control-btn">▶</button>
+                            <button class="control-btn" disabled>⟳</button>
+                            <button class="control-btn" disabled>⊗</button>
+                        </div>
+                    </div>
+
+                    <div class="service-row">
+                        <div class="status-indicator red"></div>
+                        <div class="service-info">
+                            <div class="service-name">Admin UI</div>
+                            <div class="service-status">Error • connection failed</div>
+                        </div>
+                        <div class="service-controls">
+                            <button class="control-btn">▶</button>
+                            <button class="control-btn">⟳</button>
+                            <button class="control-btn">⊗</button>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="action-btn">Start All</button>
+                        <button class="action-btn">Stop All</button>
+                    </div>
+
+                    <div class="footer">
+                        <span>Last refreshed: 12:34:45 PM</span>
+                        <a class="settings-link">Settings</a>
+                    </div>
+                </div>
+
+                <div class="designer-note">
+                    <strong>Advantages:</strong> Minimal menu height, fast to scan, simple code, menu bar native.<br>
+                    <strong>Size:</strong> ~400px width × ~300px height (typical menu bar dropdown)<br>
+                    <strong>Implementation time:</strong> 3-4 hours
+                </div>
+            </div>
+
+            <!-- DESIGN 2: Cards Layout -->
+            <div class="mockup-section">
+                <div class="mockup-header">
+                    Design 2: Cards Layout (More Visual)
+                </div>
+                <div class="mockup-content">
+                    <div class="cards-header">
+                        <div class="cards-header-title">📊 Development Services</div>
+                        <button class="refresh-btn">↻</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="status-indicator green"></div>
+                            <div class="card-title">Colima</div>
+                        </div>
+                        <div class="card-description">Docker Runtime</div>
+                        <div class="card-details">
+                            <div class="card-detail-item">
+                                <span class="card-detail-label">Status:</span>
+                                <span class="card-detail-value">Running</span>
+                            </div>
+                            <div class="card-detail-item">
+                                <span class="card-detail-label">Uptime:</span>
+                                <span class="card-detail-value">24h 32m</span>
+                            </div>
+                            <div class="card-detail-item">
+                                <span class="card-detail-label">Latency:</span>
+                                <span class="card-detail-value">0ms</span>
+                            </div>
+                            <div class="card-detail-item">
+                                <span class="card-detail-label">Health:</span>
+                                <span class="card-detail-value" style="color: #34c759;">Excellent</span>
+                            </div>
+                        </div>
+                        <div class="card-controls">
+                            <button class="card-btn" disabled>▶ Start</button>
+                            <button class="card-btn">⟳ Restart</button>
+                            <button class="card-btn">⊗ Stop</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="status-indicator green"></div>
+                            <div class="card-title">Supabase</div>
+                        </div>
+                        <div class="card-description">Database + API + Edge Functions</div>
+                        <div class="card-details">
+                            <div class="card-detail-item">
+                                <span class="card-detail-label">Status:</span>
+                                <span class="card-detail-value">Running</span>
+                            </div>
+                            <div class="card-detail-item">
+                                <span class="card-detail-label">Uptime:</span>
+                                <span class="card-detail-value">24h 32m</span>
+                            </div>
+                            <div class="card-detail-item">
+                                <span class="card-detail-label">Latency:</span>
+                                <span class="card-detail-value">45ms</span>
+                            </div>
+                            <div class="card-detail-item">
+                                <span class="card-detail-label">Health:</span>
+                                <span class="card-detail-value" style="color: #34c759;">Healthy</span>
+                            </div>
+                        </div>
+                        <div class="card-controls">
+                            <button class="card-btn" disabled>▶ Start</button>
+                            <button class="card-btn">⟳ Restart</button>
+                            <button class="card-btn">⊗ Stop</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="status-indicator orange"></div>
+                            <div class="card-title">Customer UI</div>
+                        </div>
+                        <div class="card-description">UI on port 8080</div>
+                        <div class="card-details">
+                            <div class="card-detail-item">
+                                <span class="card-detail-label">Status:</span>
+                                <span class="card-detail-value" style="color: #ff9500;">Starting</span>
+                            </div>
+                            <div class="card-detail-item">
+                                <span class="card-detail-label">Progress:</span>
+                                <span class="card-detail-value">60%</span>
+                            </div>
+                            <div class="card-detail-item">
+                                <span class="card-detail-label">Latency:</span>
+                                <span class="card-detail-value">—</span>
+                            </div>
+                            <div class="card-detail-item">
+                                <span class="card-detail-label">Health:</span>
+                                <span class="card-detail-value">Checking</span>
+                            </div>
+                        </div>
+                        <div class="card-controls">
+                            <button class="card-btn">▶ Start</button>
+                            <button class="card-btn">⟳ Restart</button>
+                            <button class="card-btn">⊗ Stop</button>
+                        </div>
+                    </div>
+
+                    <div class="cards-actions">
+                        <button>⚡ Start All</button>
+                        <button>⏹️ Stop All</button>
+                        <button>🔄 Restart All</button>
+                    </div>
+                </div>
+
+                <div class="designer-note">
+                    <strong>Advantages:</strong> Modern visual design, more information, better hierarchy.<br>
+                    <strong>Size:</strong> ~420px width × ~500px height (may exceed typical menu bar)<br>
+                    <strong>Implementation time:</strong> 5-6 hours
+                </div>
+            </div>
+        </div>
+
+        <!-- DESIGN 3: Tabbed Dashboard -->
+        <div class="mockup-section" style="max-width: 900px; margin: 0 auto 40px;">
+            <div class="mockup-header">
+                Design 3: Tabbed Dashboard (Full-Featured)
+            </div>
+            <div class="mockup-content">
+                <div class="tabbed-container">
+                    <div class="tab-nav">
+                        <button class="tab-button active" onclick="switchTab(event, 'overview')">Overview</button>
+                        <button class="tab-button" onclick="switchTab(event, 'details')">Details</button>
+                        <button class="tab-button" onclick="switchTab(event, 'logs')">Logs</button>
+                        <button class="tab-button" onclick="switchTab(event, 'settings')">Settings</button>
+                    </div>
+
+                    <div id="overview" class="tab-content active">
+                        <div style="padding: 16px;">
+                            <h3 style="font-size: 13px; font-weight: 600; margin-bottom: 12px;">Service Status Grid</h3>
+                            <div class="status-grid">
+                                <div class="status-box">
+                                    <div class="status-box-indicator">🟢</div>
+                                    <div class="status-box-title">Colima</div>
+                                    <div class="status-box-value">Running</div>
+                                    <div class="status-box-value" style="font-size: 10px;">0ms latency</div>
+                                </div>
+                                <div class="status-box">
+                                    <div class="status-box-indicator">🟢</div>
+                                    <div class="status-box-title">Supabase</div>
+                                    <div class="status-box-value">Running</div>
+                                    <div class="status-box-value" style="font-size: 10px;">45ms latency</div>
+                                </div>
+                                <div class="status-box">
+                                    <div class="status-box-indicator">🟢</div>
+                                    <div class="status-box-title">Python-BE</div>
+                                    <div class="status-box-value">Running</div>
+                                    <div class="status-box-value" style="font-size: 10px;">12ms latency</div>
+                                </div>
+                                <div class="status-box">
+                                    <div class="status-box-indicator">🟠</div>
+                                    <div class="status-box-title">Customer UI</div>
+                                    <div class="status-box-value">Stopped</div>
+                                    <div class="status-box-value" style="font-size: 10px;">offline</div>
+                                </div>
+                                <div class="status-box">
+                                    <div class="status-box-indicator">🔴</div>
+                                    <div class="status-box-title">Admin UI</div>
+                                    <div class="status-box-value">Failed</div>
+                                    <div class="status-box-value" style="font-size: 10px;">connection err</div>
+                                </div>
+                            </div>
+
+                            <div class="stats-section">
+                                <div class="stats-title">📊 Quick Stats</div>
+                                <div class="stats-item">
+                                    <span>Healthy Services:</span>
+                                    <strong>3/5</strong>
+                                </div>
+                                <div class="stats-item">
+                                    <span>System Health:</span>
+                                    <strong>60% (3 critical running)</strong>
+                                </div>
+                                <div class="stats-item">
+                                    <span>Total Uptime:</span>
+                                    <strong>24h 32m</strong>
+                                </div>
+                                <div class="stats-item">
+                                    <span>Last Issue:</span>
+                                    <strong>Admin UI error (2h ago)</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="details" class="tab-content">
+                        <div style="padding: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <h3 style="font-size: 13px; font-weight: 600;">Service Details</h3>
+                                <select class="select-input">
+                                    <option>Supabase</option>
+                                    <option>Colima</option>
+                                    <option>Python Backend</option>
+                                </select>
+                            </div>
+
+                            <div class="stats-section">
+                                <div class="stats-title">Supabase Information</div>
+                                <div class="stats-item">
+                                    <span>Status:</span>
+                                    <strong style="color: #34c759;">Running</strong>
+                                </div>
+                                <div class="stats-item">
+                                    <span>Type:</span>
+                                    <strong>Database + API + Edge Functions</strong>
+                                </div>
+                                <div class="stats-item">
+                                    <span>Port:</span>
+                                    <strong>54321</strong>
+                                </div>
+                                <div class="stats-item">
+                                    <span>Last Started:</span>
+                                    <strong>Today at 08:15 AM</strong>
+                                </div>
+                                <div class="stats-item">
+                                    <span>Uptime:</span>
+                                    <strong>24h 32m</strong>
+                                </div>
+                                <div class="stats-item">
+                                    <span>Average Latency:</span>
+                                    <strong>45ms</strong>
+                                </div>
+                                <div class="stats-item">
+                                    <span>Health:</span>
+                                    <strong style="color: #34c759;">Excellent</strong>
+                                </div>
+                                <div class="stats-item">
+                                    <span>Requests/min:</span>
+                                    <strong>1,250</strong>
+                                </div>
+                                <div class="stats-item">
+                                    <span>Errors/min:</span>
+                                    <strong style="color: #ff9500;">2</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="logs" class="tab-content">
+                        <div style="padding: 16px;">
+                            <h3 style="font-size: 13px; font-weight: 600; margin-bottom: 12px;">Service Logs</h3>
+                            <div class="logs-list">
+                                <div class="log-entry info">12:34:45 [INFO]  Health check: OK (45ms)</div>
+                                <div class="log-entry info">12:34:42 [INFO]  DB query completed (125ms)</div>
+                                <div class="log-entry info">12:34:38 [INFO]  Health check: OK (48ms)</div>
+                                <div class="log-entry info">12:34:35 [INFO]  Connection pool: 8/10 active</div>
+                                <div class="log-entry warning">12:34:32 [WARN]  Latency spike detected (156ms)</div>
+                                <div class="log-entry info">12:34:28 [INFO]  Health check: OK (52ms)</div>
+                                <div class="log-entry error">12:34:25 [ERROR] Failed health check after 5s</div>
+                                <div class="log-entry info">12:34:20 [INFO]  Service restarted</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="settings" class="tab-content">
+                        <div style="padding: 16px;">
+                            <div class="settings-group">
+                                <div class="settings-label">Service Control</div>
+                                <div class="settings-item">
+                                    <input type="checkbox" class="checkbox" checked>
+                                    <label>Auto-recover on wake</label>
+                                </div>
+                                <div class="settings-item">
+                                    <input type="checkbox" class="checkbox" checked>
+                                    <label>Auto-start on launch</label>
+                                </div>
+                                <div class="settings-item">
+                                    <input type="checkbox" class="checkbox" checked>
+                                    <label>Show notifications</label>
+                                </div>
+                            </div>
+
+                            <div class="settings-group">
+                                <div class="settings-label">Monitoring</div>
+                                <div class="settings-item">
+                                    <span style="flex: 1;">Refresh Interval:</span>
+                                    <select class="select-input" style="width: 120px;">
+                                        <option>2 seconds</option>
+                                        <option selected>3 seconds</option>
+                                        <option>5 seconds</option>
+                                        <option>10 seconds</option>
+                                    </select>
+                                </div>
+                                <div class="settings-item">
+                                    <span style="flex: 1;">Log Retention:</span>
+                                    <select class="select-input" style="width: 120px;">
+                                        <option>7 days</option>
+                                        <option selected>30 days</option>
+                                        <option>90 days</option>
+                                        <option>1 year</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="designer-note">
+                <strong>Advantages:</strong> Professional dashboard, detailed metrics, logging, full settings.<br>
+                <strong>Size:</strong> Full window (~800px × 600px), not just menu bar dropdown<br>
+                <strong>Implementation time:</strong> 12+ hours
+            </div>
+        </div>
+
+        <!-- Comparison -->
+        <div class="mockup-section" style="max-width: 900px; margin: 0 auto;">
+            <div class="mockup-header">
+                Design Comparison Matrix
+            </div>
+            <div class="mockup-content" style="padding: 16px;">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Compact Vertical</th>
+                            <th>Cards Layout</th>
+                            <th>Tabbed Dashboard</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Menu bar friendly</strong></td>
+                            <td><span class="check">✅</span> Excellent</td>
+                            <td><span class="warning">⚠️</span> Good</td>
+                            <td><span class="cross">❌</span> Not ideal</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Quick status check</strong></td>
+                            <td><span class="check">✅</span> Fast</td>
+                            <td><span class="check">✅</span> Fast</td>
+                            <td><span class="warning">⚠️</span> Medium</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Visual appeal</strong></td>
+                            <td><span class="warning">⚠️</span> Basic</td>
+                            <td><span class="check">✅</span> Modern</td>
+                            <td><span class="check">✅</span> Professional</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Code complexity</strong></td>
+                            <td><span class="check">✅</span> Low</td>
+                            <td><span class="warning">⚠️</span> Medium</td>
+                            <td><span class="cross">❌</span> High</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Development time</strong></td>
+                            <td><span class="check">✅</span> 3-4 hrs</td>
+                            <td><span class="warning">⚠️</span> 5-6 hrs</td>
+                            <td><span class="cross">❌</span> 12+ hrs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>MVP suitable</strong></td>
+                            <td><span class="check">✅</span> YES</td>
+                            <td><span class="warning">⚠️</span> Maybe</td>
+                            <td><span class="cross">❌</span> No</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Future extensibility</strong></td>
+                            <td><span class="warning">⚠️</span> Limited</td>
+                            <td><span class="check">✅</span> Good</td>
+                            <td><span class="check">✅</span> Excellent</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="recommendation">
+                    <strong>🎯 Recommendation: Start with "Compact Vertical" for MVP</strong><br><br>
+                    Then expand to Cards layout if needed. Keep the tabbed dashboard as a future v2.0 enhancement.
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function switchTab(event, tabName) {
+                // Hide all tabs
+                const tabs = document.querySelectorAll('.tab-content');
+                tabs.forEach(tab => tab.classList.remove('active'));
+
+                // Remove active from all buttons
+                const buttons = document.querySelectorAll('.tab-button');
+                buttons.forEach(btn => btn.classList.remove('active'));
+
+                // Show selected tab
+                document.getElementById(tabName).classList.add('active');
+                event.target.classList.add('active');
+            }
+        </script>
+    </div>
+</body>
+</html>

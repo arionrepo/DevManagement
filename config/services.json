@@ -13,9 +13,9 @@
       "critical": true,
       "startup_delay_seconds": 2,
       "commands": {
-        "start": "colima start",
+        "start": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/scripts/01-colima-start.sh",
         "stop": "colima stop",
-        "restart": "colima stop && colima start",
+        "restart": "colima stop && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/scripts/01-colima-start.sh",
         "status": "colima status"
       },
       "health_check": {
@@ -25,11 +25,17 @@
         "timeout_seconds": 5
       },
       "files": {
-        "startup_scripts": [],
+        "startup_scripts": [
+          {
+            "name": "01-colima-start.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/scripts/01-colima-start.sh",
+            "description": "Modular Colima startup script with proper initialization"
+          }
+        ],
         "config_files": [],
         "related_files": []
       },
-      "notes": "Docker runtime must start first. May take 5-30 seconds for socket to become available."
+      "notes": "Docker runtime must start first. Uses 01-colima-start.sh modular startup script. May take 5-30 seconds for socket to become available."
     },
     {
       "id": "supabase",
@@ -147,9 +153,9 @@
       "critical": true,
       "startup_delay_seconds": 3,
       "commands": {
-        "start": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/start.sh",
-        "stop": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/stop.sh",
-        "restart": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/stop.sh && sleep 1 && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/start.sh",
+        "start": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/scripts/05-python-backend.sh",
+        "stop": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/stop-backend.sh",
+        "restart": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/stop-backend.sh && sleep 1 && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/scripts/05-python-backend.sh",
         "status": "curl -s http://127.0.0.1:8001/health"
       },
       "health_check": {
@@ -174,15 +180,20 @@
       "files": {
         "startup_scripts": [
           {
-            "name": "start.sh",
-            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/start.sh",
-            "description": "Start Python backend"
+            "name": "05-python-backend.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/scripts/05-python-backend.sh",
+            "description": "Modular Python backend startup wrapper"
+          },
+          {
+            "name": "main-start-backend.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/main-start-backend.sh",
+            "description": "Main Python backend startup script (called by wrapper)"
           }
         ],
         "stop_scripts": [
           {
-            "name": "stop.sh",
-            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/stop.sh",
+            "name": "stop-backend.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/stop-backend.sh",
             "description": "Stop Python backend"
           }
         ],
@@ -215,9 +226,9 @@
       "critical": false,
       "startup_delay_seconds": 2,
       "commands": {
-        "start": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/admin-internal-ui/start.sh",
-        "stop": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/admin-internal-ui/stop.sh",
-        "restart": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/admin-internal-ui/stop.sh && sleep 1 && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/admin-internal-ui/start.sh",
+        "start": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/internal-admin-ui/main-start.sh",
+        "stop": "pkill -f 'internal-admin-ui|vite.*8082'",
+        "restart": "pkill -f 'internal-admin-ui|vite.*8082' && sleep 1 && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/internal-admin-ui/main-start.sh",
         "status": "curl -s http://127.0.0.1:8082/health"
       },
       "health_check": {
@@ -242,18 +253,12 @@
       "files": {
         "startup_scripts": [
           {
-            "name": "start.sh",
-            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/admin-internal-ui/start.sh",
-            "description": "Start Admin UI"
+            "name": "main-start.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/internal-admin-ui/main-start.sh",
+            "description": "Main startup script for Admin UI"
           }
         ],
-        "stop_scripts": [
-          {
-            "name": "stop.sh",
-            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/admin-internal-ui/stop.sh",
-            "description": "Stop Admin UI"
-          }
-        ],
+        "stop_scripts": [],
         "config_files": [],
         "related_files": []
       },
@@ -271,9 +276,9 @@
       "critical": false,
       "startup_delay_seconds": 2,
       "commands": {
-        "start": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui/start.sh",
-        "stop": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui/stop.sh",
-        "restart": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui/stop.sh && sleep 1 && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui/start.sh",
+        "start": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui-dup/main-start.sh",
+        "stop": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui-dup/stop.sh",
+        "restart": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui-dup/stop.sh && sleep 1 && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui-dup/main-start.sh",
         "status": "curl -s http://127.0.0.1:8080/health"
       },
       "health_check": {
@@ -298,15 +303,15 @@
       "files": {
         "startup_scripts": [
           {
-            "name": "start.sh",
-            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui/start.sh",
-            "description": "Start Customer UI"
+            "name": "main-start.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui-dup/main-start.sh",
+            "description": "Main startup script for Customer UI"
           }
         ],
         "stop_scripts": [
           {
             "name": "stop.sh",
-            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui/stop.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui-dup/stop.sh",
             "description": "Stop Customer UI"
           }
         ],

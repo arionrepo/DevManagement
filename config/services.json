@@ -1,0 +1,360 @@
+{
+  "version": "1.0",
+  "description": "DevManagement services configuration for ArionComply development environment",
+  "services": [
+    {
+      "id": "colima",
+      "name": "colima",
+      "display_name": "Colima",
+      "type": "process",
+      "icon": "🐳",
+      "description": "Docker runtime for macOS",
+      "startup_order": 1,
+      "critical": true,
+      "startup_delay_seconds": 2,
+      "commands": {
+        "start": "colima start",
+        "stop": "colima stop",
+        "restart": "colima stop && colima start",
+        "status": "colima status"
+      },
+      "health_check": {
+        "type": "command",
+        "command": "colima status",
+        "expected_output_pattern": "running",
+        "timeout_seconds": 5
+      },
+      "files": {
+        "startup_scripts": [],
+        "config_files": [],
+        "related_files": []
+      },
+      "notes": "Docker runtime must start first. May take 5-30 seconds for socket to become available."
+    },
+    {
+      "id": "supabase",
+      "name": "supabase",
+      "display_name": "Supabase",
+      "type": "http",
+      "icon": "🟢",
+      "description": "Database, API Gateway, Edge Functions, Auth, and Realtime",
+      "startup_order": 2,
+      "critical": true,
+      "startup_delay_seconds": 5,
+      "commands": {
+        "start": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/main-startsupabase.sh && sleep 5 && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/scripts/03-db-restore.sh --force",
+        "stop": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/main-stopsupabase.sh",
+        "restart": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/main-stopsupabase.sh && sleep 2 && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/main-startsupabase.sh && sleep 5 && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/scripts/03-db-restore.sh --force",
+        "status": "curl -s http://127.0.0.1:54321/rest/v1/ | head -c 50"
+      },
+      "health_check": {
+        "type": "http",
+        "endpoints": [
+          {
+            "url": "http://127.0.0.1:54321/rest/v1/",
+            "expected_status_codes": [200, 401],
+            "description": "PostgREST API Gateway"
+          },
+          {
+            "url": "http://localhost:54321/rest/v1/",
+            "expected_status_codes": [200, 401],
+            "description": "PostgREST API Gateway (localhost variant)"
+          }
+        ],
+        "timeout_seconds": 5,
+        "interval_seconds": 3
+      },
+      "ports": [
+        {
+          "name": "API Gateway",
+          "port": 54321,
+          "protocol": "http"
+        },
+        {
+          "name": "Database",
+          "port": 54322,
+          "protocol": "postgresql"
+        },
+        {
+          "name": "Studio",
+          "port": 54323,
+          "protocol": "http"
+        },
+        {
+          "name": "Inbucket Email",
+          "port": 54324,
+          "protocol": "http"
+        }
+      ],
+      "files": {
+        "startup_scripts": [
+          {
+            "name": "main-startsupabase.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/main-startsupabase.sh",
+            "description": "Main startup orchestration script"
+          }
+        ],
+        "stop_scripts": [
+          {
+            "name": "main-stopsupabase.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/main-stopsupabase.sh",
+            "description": "Stop all Supabase services"
+          }
+        ],
+        "backup_scripts": [
+          {
+            "name": "03-db-restore.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/scripts/03-db-restore.sh",
+            "description": "Restore database from last best backup (called automatically during startup)"
+          }
+        ],
+        "config_files": [
+          {
+            "name": "config.toml",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/config.toml",
+            "description": "Supabase local development configuration"
+          },
+          {
+            "name": "services.json",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/DevManagement/config/services.json",
+            "description": "DevManagement services configuration"
+          }
+        ],
+        "related_files": [
+          {
+            "name": "README.md",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/README.md",
+            "description": "Supabase documentation"
+          },
+          {
+            "name": "docker-compose.yml",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/docker-compose.yml",
+            "description": "Docker compose configuration"
+          }
+        ]
+      },
+      "dependencies": ["colima"],
+      "notes": "CRITICAL: Startup process (1) starts Supabase containers, (2) waits 5 seconds for DB to initialize, (3) restores from last best backup (not migrations). The 03-db-restore.sh script automatically finds the latest complete backup in /Users/liborballaty/supabase-backups/arioncomply-v1/critical/4hourly/ and restores it with --force flag. Requires Colima to be running first. Total time: 1-2 minutes for full initialization and restore."
+    },
+    {
+      "id": "python-backend",
+      "name": "python-backend",
+      "display_name": "Python Backend",
+      "type": "http",
+      "icon": "🐍",
+      "description": "FastAPI backend server for AI services",
+      "startup_order": 3,
+      "critical": true,
+      "startup_delay_seconds": 3,
+      "commands": {
+        "start": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/start.sh",
+        "stop": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/stop.sh",
+        "restart": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/stop.sh && sleep 1 && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/start.sh",
+        "status": "curl -s http://127.0.0.1:8001/health"
+      },
+      "health_check": {
+        "type": "http",
+        "endpoints": [
+          {
+            "url": "http://127.0.0.1:8001/health",
+            "expected_status_codes": [200],
+            "description": "Health check endpoint"
+          }
+        ],
+        "timeout_seconds": 5,
+        "interval_seconds": 3
+      },
+      "ports": [
+        {
+          "name": "FastAPI Server",
+          "port": 8001,
+          "protocol": "http"
+        }
+      ],
+      "files": {
+        "startup_scripts": [
+          {
+            "name": "start.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/start.sh",
+            "description": "Start Python backend"
+          }
+        ],
+        "stop_scripts": [
+          {
+            "name": "stop.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/stop.sh",
+            "description": "Stop Python backend"
+          }
+        ],
+        "config_files": [
+          {
+            "name": "requirements.txt",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/requirements.txt",
+            "description": "Python dependencies"
+          }
+        ],
+        "related_files": [
+          {
+            "name": "main.py",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/ai-backend/python-backend/main.py",
+            "description": "FastAPI main application"
+          }
+        ]
+      },
+      "dependencies": ["supabase"],
+      "notes": "Depends on Supabase being ready. Takes 5-10 seconds to start."
+    },
+    {
+      "id": "admin-ui",
+      "name": "admin-ui",
+      "display_name": "Admin UI",
+      "type": "http",
+      "icon": "⚙️",
+      "description": "Internal administration interface",
+      "startup_order": 4,
+      "critical": false,
+      "startup_delay_seconds": 2,
+      "commands": {
+        "start": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/admin-internal-ui/start.sh",
+        "stop": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/admin-internal-ui/stop.sh",
+        "restart": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/admin-internal-ui/stop.sh && sleep 1 && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/admin-internal-ui/start.sh",
+        "status": "curl -s http://127.0.0.1:8082/health"
+      },
+      "health_check": {
+        "type": "http",
+        "endpoints": [
+          {
+            "url": "http://127.0.0.1:8082/health",
+            "expected_status_codes": [200],
+            "description": "Health check endpoint"
+          }
+        ],
+        "timeout_seconds": 5,
+        "interval_seconds": 3
+      },
+      "ports": [
+        {
+          "name": "Admin UI Server",
+          "port": 8082,
+          "protocol": "http"
+        }
+      ],
+      "files": {
+        "startup_scripts": [
+          {
+            "name": "start.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/admin-internal-ui/start.sh",
+            "description": "Start Admin UI"
+          }
+        ],
+        "stop_scripts": [
+          {
+            "name": "stop.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/admin-internal-ui/stop.sh",
+            "description": "Stop Admin UI"
+          }
+        ],
+        "config_files": [],
+        "related_files": []
+      },
+      "dependencies": ["supabase"],
+      "notes": "Internal-only administration interface. Not critical for core functionality."
+    },
+    {
+      "id": "customer-ui",
+      "name": "customer-ui",
+      "display_name": "Customer UI",
+      "type": "http",
+      "icon": "👥",
+      "description": "Customer-facing compliance interface",
+      "startup_order": 5,
+      "critical": false,
+      "startup_delay_seconds": 2,
+      "commands": {
+        "start": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui/start.sh",
+        "stop": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui/stop.sh",
+        "restart": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui/stop.sh && sleep 1 && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui/start.sh",
+        "status": "curl -s http://127.0.0.1:8080/health"
+      },
+      "health_check": {
+        "type": "http",
+        "endpoints": [
+          {
+            "url": "http://127.0.0.1:8080/health",
+            "expected_status_codes": [200],
+            "description": "Health check endpoint"
+          }
+        ],
+        "timeout_seconds": 5,
+        "interval_seconds": 3
+      },
+      "ports": [
+        {
+          "name": "Customer UI Server",
+          "port": 8080,
+          "protocol": "http"
+        }
+      ],
+      "files": {
+        "startup_scripts": [
+          {
+            "name": "start.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui/start.sh",
+            "description": "Start Customer UI"
+          }
+        ],
+        "stop_scripts": [
+          {
+            "name": "stop.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/customer-compliance-ui/stop.sh",
+            "description": "Stop Customer UI"
+          }
+        ],
+        "config_files": [],
+        "related_files": []
+      },
+      "dependencies": ["supabase"],
+      "notes": "Customer-facing UI. Not critical for core development but important for integration testing."
+    }
+  ],
+  "global_settings": {
+    "auto_start_on_wake": true,
+    "auto_recover_on_wake": true,
+    "health_check_interval_seconds": 3,
+    "health_check_timeout_seconds": 5,
+    "log_directory": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/logs",
+    "pid_directory": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/.pids"
+  },
+  "future_services": {
+    "vectordb": {
+      "display_name": "VectorDB (Supabase pgvector)",
+      "description": "Vector embedding storage using PostgreSQL pgvector extension",
+      "estimated_phase": "v1.1"
+    },
+    "chromadb": {
+      "display_name": "ChromaDB",
+      "description": "Alternative vector database for embeddings",
+      "estimated_phase": "v1.1"
+    },
+    "logging_database": {
+      "display_name": "Logging Database",
+      "description": "Observability and logging storage",
+      "estimated_phase": "v1.2"
+    },
+    "app_container": {
+      "display_name": "App Container",
+      "description": "Main application container",
+      "estimated_phase": "v1.2"
+    },
+    "backup_container": {
+      "display_name": "Backup Container",
+      "description": "Automated backup and recovery",
+      "estimated_phase": "v1.2"
+    },
+    "observability_stack": {
+      "display_name": "Observability Stack",
+      "description": "Metrics, tracing, and monitoring",
+      "estimated_phase": "v1.2"
+    }
+  }
+}

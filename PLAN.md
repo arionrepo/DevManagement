@@ -16,12 +16,17 @@
 - Extensible design - easily add new services
 - Configurable health checks and recovery behavior
 
-**Scope for MVP:** Handle ArionComply development services
+**Scope for MVP:** Handle ArionComply development services with file explorer and detailed views
 - Colima (Docker runtime)
 - Supabase (database, API, Edge Functions)
 - Python Backend (FastAPI)
 - Customer UI
 - Admin UI
+
+**Design Strategy:** Start with Compact Menu Bar → Expand to Tabbed Dashboard
+- MVP: Compact menu bar with status indicators + info button
+- Full-featured: Detailed window with 6 tabs (Overview, Details, Files & Scripts, Logs, Architecture, Settings)
+- Future: Add support for VectorDB, ChromaDB, Logging DB, containers (app, backup, observability)
 
 ## Repository Structure
 
@@ -1305,22 +1310,173 @@ Files to create/update:
 
 ---
 
+## Phase 3B: File Explorer & Detailed Views (Enhanced)
+
+### Overview
+The detailed view window provides deep visibility into each service with file explorer, logs, and architecture tabs.
+
+### Components
+
+#### 3B.1 File Explorer Tab
+Displays all files and scripts related to a service:
+- Startup scripts (main-startsupabase.sh, main-start.sh)
+- Configuration files (services.json, docker-compose.yml)
+- Stop/cleanup scripts
+- Service logs
+- One-click "Open" button to open files in default editor
+- Copy path button for each file
+- Grouped by category (Startup Scripts, Config Files, Related Files)
+
+**Implementation:**
+```swift
+struct FileExplorerView: View {
+    let service: Service
+    @State var selectedFile: String?
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            SectionHeader("Startup Scripts")
+            ForEach(service.files.startupScripts) { file in
+                FileRowView(file: file)
+            }
+
+            SectionHeader("Configuration Files")
+            ForEach(service.files.configFiles) { file in
+                FileRowView(file: file)
+            }
+
+            SectionHeader("Related Files")
+            ForEach(service.files.relatedFiles) { file in
+                FileRowView(file: file)
+            }
+        }
+    }
+}
+
+struct FileRowView: View {
+    let file: ServiceFile
+
+    var body: some View {
+        HStack {
+            Image(systemName: file.icon)
+            Text(file.name).font(.caption)
+            Spacer()
+            Button(action: { openFile(file.path) }) {
+                Text("Open").font(.caption).foregroundColor(.blue)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+}
+```
+
+#### 3B.2 Logs Tab
+Real-time service logs with:
+- Color-coded entries (INFO=green, WARN=orange, ERROR=red)
+- Monospace font for log viewing
+- Auto-scroll to latest entry
+- Clear logs button
+- Log level filter
+
+#### 3B.3 Architecture Tab
+Shows:
+- Service dependency tree
+- Related containers and services
+- Future services roadmap (VectorDB, ChromaDB, Logging DB, etc.)
+- Expandable sections for each category
+
+#### 3B.4 Detailed View Data Model
+```swift
+struct ServiceFile {
+    let name: String
+    let path: String
+    let icon: String  // SF Symbol name
+    let category: FileCategory
+}
+
+enum FileCategory {
+    case startupScript
+    case configFile
+    case relatedFile
+    case log
+}
+
+extension Service {
+    var files: ServiceFiles {
+        // Returns all files for this service
+        // Loaded from config/services.json
+    }
+}
+```
+
+### Service Configuration with Files
+Update services.json to include file mappings:
+
+```json
+{
+  "services": [
+    {
+      "name": "supabase",
+      "display_name": "Supabase",
+      "files": {
+        "startup_scripts": [
+          {
+            "name": "main-startsupabase.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/main-startsupabase.sh"
+          }
+        ],
+        "config_files": [
+          {
+            "name": "services.json",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/DevManagement/config/services.json"
+          },
+          {
+            "name": "docker-compose.yml",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/docker-compose.yml"
+          }
+        ],
+        "related_files": [
+          {
+            "name": "main-stopsupabase.sh",
+            "path": "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/main-stopsupabase.sh"
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+---
+
 ## Known Limitations & Future Enhancements
 
-### Current Limitations
+### Current Limitations (MVP)
 1. **Single device only** - Not designed for multi-machine management
 2. **Local scripts only** - Cannot manage services on remote machines
-3. **Manual configuration** - Must manually update services.json for new services
-4. **No logging history** - Logs only stored in app memory/Documents folder
+3. **5 services only** - Initial scope: Colima, Supabase, Python Backend, Admin UI, Customer UI
+4. **No logging history** - Logs displayed only, not persisted
 
-### Future Enhancements (v2.0+)
-1. **Service templates** - Pre-configured templates for common dev stacks
-2. **Custom health checks** - Allow users to define custom health check scripts
-3. **Notifications** - Desktop notifications for service failures/recoveries
-4. **Dashboard view** - Historical graphs of service uptime/latency
-5. **Log viewer** - Integrated log viewer for each service
-6. **Remote management** - SSH support for managing remote machines
-7. **Export/Import** - Share service configurations between developers
+### Future Enhancements (v1.1+)
+
+**Additional Services:**
+1. **VectorDB** - Supabase pgvector integration monitoring
+2. **ChromaDB** - Alternative vector store monitoring
+3. **Logging Database** - Observability storage monitoring
+4. **Containers** - Individual Docker container monitoring
+   - app-container
+   - backup-container
+   - observability-stack
+
+**Features:**
+1. **Dashboard view** - Historical graphs of service uptime/latency
+2. **Custom health checks** - User-defined health check scripts
+3. **Notifications** - Desktop notifications for failures/recoveries
+4. **Remote management** - SSH support for managing remote machines
+5. **Service templates** - Pre-configured templates for common dev stacks
+6. **Export/Import** - Share service configurations between developers
+7. **Metrics dashboard** - Real-time and historical metrics graphs
+8. **Advanced logging** - Persistent log storage with search and filtering
 
 ---
 

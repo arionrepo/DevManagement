@@ -472,6 +472,13 @@ class ServiceManager {
     }
 
     private func checkHttpStatus(_ service: Service) throws -> ServiceStatus {
+        // For Supabase, first verify Docker containers are running
+        if service.id == "supabase" {
+            if !checkDockerContainers(serviceName: "supabase", requiredCount: 5) {
+                return ServiceStatus(icon: "🔴", description: "Containers stopped")
+            }
+        }
+
         guard let healthCheck = service.healthCheck,
               let endpoints = healthCheck.endpoints,
               !endpoints.isEmpty else {
@@ -485,6 +492,30 @@ class ServiceManager {
         }
 
         return ServiceStatus(icon: "🔴", description: "Health check failed")
+    }
+
+    private func checkDockerContainers(serviceName: String, requiredCount: Int) -> Bool {
+        let process = Process()
+        process.launchPath = "/bin/bash"
+        process.arguments = ["-c", "docker ps --filter \"name=\(serviceName)\" --format \"{{.Names}}\" 2>/dev/null | wc -l | tr -d ' '"]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            if let output = String(data: data, encoding: .utf8),
+               let count = Int(output.trimmingCharacters(in: .whitespacesAndNewlines)) {
+                return count >= requiredCount
+            }
+        } catch {
+            return false
+        }
+
+        return false
     }
 
     private func checkHttpEndpoint(_ endpoint: HealthCheckEndpoint) throws -> ServiceStatus? {

@@ -14,13 +14,13 @@
       "startup_delay_seconds": 2,
       "commands": {
         "start": "bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/scripts/01-colima-start.sh",
-        "stop": "colima stop",
-        "restart": "colima stop && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/scripts/01-colima-start.sh",
-        "status": "colima status"
+        "stop": "colima stop app",
+        "restart": "colima stop app && bash /Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/supabase/scripts/01-colima-start.sh",
+        "status": "colima status app"
       },
       "health_check": {
         "type": "command",
-        "command": "colima status",
+        "command": "colima status app",
         "expected_output_pattern": "running",
         "timeout_seconds": 5
       },

@@ -19,20 +19,21 @@ struct DevManagementApp: App {
                     HStack(spacing: 8) {
                         Text("⚙️ Dev Services")
                             .font(.system(.headline, design: .rounded))
-                            .fontWeight(.semibold)
+                            .fontWeight(.bold)
                         Spacer()
                         Button(action: { monitor.updateStatus() }) {
                             Image(systemName: "arrow.clockwise")
-                                .font(.system(size: 11, weight: .semibold))
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(.blue)
                         }
-                        .buttonStyle(.borderless)
+                        .buttonStyle(.plain)
                         .help("Refresh service status")
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.top, 10)
-                    .padding(.bottom, 6)
+                    .padding(.horizontal, 14)
+                    .padding(.top, 12)
+                    .padding(.bottom, 8)
                 }
-                .background(Color(nsColor: .controlBackgroundColor))
+                .background(Color(nsColor: NSColor(red: 0.97, green: 0.98, blue: 1.0, alpha: 1.0)))
 
                 Divider()
 
@@ -54,64 +55,79 @@ struct DevManagementApp: App {
                 Divider()
 
                 // MARK: - Action Buttons
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack(spacing: 6) {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 8) {
                         Button(action: { startAll() }) {
-                            Label("Start All", systemImage: "play.fill")
-                                .font(.caption)
-                                .frame(maxWidth: .infinity)
+                            HStack(spacing: 6) {
+                                Image(systemName: "play.fill")
+                                    .font(.system(size: 10, weight: .semibold))
+                                Text("Start All")
+                                    .font(.system(size: 12, weight: .semibold))
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 6)
                         }
-                        .buttonStyle(.bordered)
+                        .foregroundColor(.white)
+                        .background(Color.green)
+                        .cornerRadius(6)
 
                         Button(action: { stopAll() }) {
-                            Label("Stop All", systemImage: "stop.fill")
-                                .font(.caption)
-                                .frame(maxWidth: .infinity)
+                            HStack(spacing: 6) {
+                                Image(systemName: "stop.fill")
+                                    .font(.system(size: 10, weight: .semibold))
+                                Text("Stop All")
+                                    .font(.system(size: 12, weight: .semibold))
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 6)
                         }
-                        .buttonStyle(.bordered)
+                        .foregroundColor(.white)
+                        .background(Color.red)
+                        .cornerRadius(6)
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.top, 8)
-                    .padding(.bottom, 4)
+                    .padding(.horizontal, 14)
+                    .padding(.top, 10)
+                    .padding(.bottom, 8)
                 }
 
                 Divider()
 
                 // MARK: - Footer
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 0) {
-                        VStack(alignment: .leading, spacing: 3) {
+                        VStack(alignment: .leading, spacing: 2) {
                             Text("Overall Status")
-                                .font(.system(size: 10, weight: .semibold))
+                                .font(.system(size: 11, weight: .semibold))
                                 .foregroundColor(.secondary)
                             Text(monitor.overallStatus)
                                 .font(.system(.body, design: .rounded))
-                                .fontWeight(.medium)
+                                .fontWeight(.bold)
                         }
 
                         Spacer()
 
-                        VStack(alignment: .trailing, spacing: 3) {
+                        VStack(alignment: .trailing, spacing: 2) {
                             Text("Updated")
-                                .font(.system(size: 10, weight: .semibold))
+                                .font(.system(size: 11, weight: .semibold))
                                 .foregroundColor(.secondary)
                             Text(formatLastUpdate(monitor.lastUpdate))
-                                .font(.caption2)
-                                .fontWeight(.medium)
+                                .font(.system(size: 12, weight: .medium))
+                                .monospacedDigit()
                         }
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.top, 8)
+                    .padding(.horizontal, 14)
+                    .padding(.top, 10)
 
                     HStack(spacing: 6) {
                         Spacer()
                         Button(action: { NSApplication.shared.terminate(nil) }) {
                             Text("Quit")
-                                .font(.caption)
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(.red)
                         }
-                        .buttonStyle(.bordered)
-                        .padding(.horizontal, 12)
-                        .padding(.bottom, 8)
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, 14)
+                        .padding(.bottom, 10)
                     }
                 }
             }

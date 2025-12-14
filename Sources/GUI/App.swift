@@ -13,80 +13,109 @@ struct DevManagementApp: App {
 
     var body: some Scene {
         MenuBarExtra {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Text("⚙️ Development Services")
-                        .font(.headline)
-                    Spacer()
-                    Button(action: { monitor.updateStatus() }) {
-                        Image(systemName: "arrow.clockwise")
-                            .font(.caption)
+            VStack(alignment: .leading, spacing: 0) {
+                // MARK: - Header
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 8) {
+                        Text("⚙️ Dev Services")
+                            .font(.system(.headline, design: .rounded))
+                            .fontWeight(.semibold)
+                        Spacer()
+                        Button(action: { monitor.updateStatus() }) {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.system(size: 11, weight: .semibold))
+                        }
+                        .buttonStyle(.borderless)
+                        .help("Refresh service status")
                     }
-                    .buttonStyle(.borderless)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 10)
+                    .padding(.bottom, 6)
                 }
+                .background(Color(nsColor: .controlBackgroundColor))
 
                 Divider()
 
+                // MARK: - Services List
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 5) {
                         ForEach(0..<monitor.services.count, id: \.self) { index in
                             let item = monitor.services[index]
-                            HStack {
-                                Text(item.icon)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(item.displayName)
-                                        .font(.caption)
-                                    Text(item.statusDescription)
-                                        .font(.caption2)
-                                        .foregroundColor(.secondary)
-                                }
-                                Spacer()
-                                Button(action: { monitor.restart(service: item.service) }) {
-                                    Image(systemName: "arrow.clockwise")
-                                        .font(.caption)
-                                }
-                                .buttonStyle(.borderless)
+                            ServiceRowView(item: item) {
+                                monitor.restart(service: item.service)
                             }
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 8)
                 }
-                .frame(height: 200)
+                .frame(height: 220)
 
                 Divider()
 
-                HStack(spacing: 8) {
-                    Button(action: { startAll() }) {
-                        Text("Start All")
-                            .font(.caption)
+                // MARK: - Action Buttons
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 6) {
+                        Button(action: { startAll() }) {
+                            Label("Start All", systemImage: "play.fill")
+                                .font(.caption)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+
+                        Button(action: { stopAll() }) {
+                            Label("Stop All", systemImage: "stop.fill")
+                                .font(.caption)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
                     }
-                    Button(action: { stopAll() }) {
-                        Text("Stop All")
-                            .font(.caption)
-                    }
+                    .padding(.horizontal, 12)
+                    .padding(.top, 8)
+                    .padding(.bottom, 4)
                 }
-                .frame(maxWidth: .infinity)
 
                 Divider()
 
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Status: \(monitor.overallStatus)")
-                            .font(.caption2)
-                        Text(formatLastUpdate(monitor.lastUpdate))
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
+                // MARK: - Footer
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 0) {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("Overall Status")
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundColor(.secondary)
+                            Text(monitor.overallStatus)
+                                .font(.system(.body, design: .rounded))
+                                .fontWeight(.medium)
+                        }
+
+                        Spacer()
+
+                        VStack(alignment: .trailing, spacing: 3) {
+                            Text("Updated")
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundColor(.secondary)
+                            Text(formatLastUpdate(monitor.lastUpdate))
+                                .font(.caption2)
+                                .fontWeight(.medium)
+                        }
                     }
-                    Spacer()
-                    Button(action: { NSApplication.shared.terminate(nil) }) {
-                        Text("Quit")
-                            .font(.caption)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 8)
+
+                    HStack(spacing: 6) {
+                        Spacer()
+                        Button(action: { NSApplication.shared.terminate(nil) }) {
+                            Text("Quit")
+                                .font(.caption)
+                        }
+                        .buttonStyle(.bordered)
+                        .padding(.horizontal, 12)
+                        .padding(.bottom, 8)
                     }
-                    .buttonStyle(.borderless)
                 }
             }
-            .padding(12)
-            .frame(width: 340)
+            .frame(width: 360)
             .onAppear {
                 monitor.startMonitoring()
             }
@@ -94,11 +123,12 @@ struct DevManagementApp: App {
                 monitor.stopMonitoring()
             }
         } label: {
-            HStack(spacing: 2) {
+            HStack(spacing: 4) {
                 Image(systemName: "gear.circle.fill")
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(statusColor())
                 Text("Dev")
-                    .font(.system(size: 12))
+                    .font(.system(size: 11, weight: .semibold))
             }
         }
     }

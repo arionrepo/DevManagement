@@ -20,20 +20,21 @@ struct DevManagementApp: App {
                         Text("⚙️ Dev Services")
                             .font(.system(.headline, design: .rounded))
                             .fontWeight(.bold)
+                            .foregroundColor(.primary)
                         Spacer()
                         Button(action: { monitor.updateStatus() }) {
                             Image(systemName: "arrow.clockwise")
                                 .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(.blue)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.bordered)
+                        .tint(.blue)
+                        .controlSize(.small)
                         .help("Refresh service status")
                     }
                     .padding(.horizontal, 14)
                     .padding(.top, 12)
                     .padding(.bottom, 8)
                 }
-                .background(Color(nsColor: NSColor(red: 0.97, green: 0.98, blue: 1.0, alpha: 1.0)))
 
                 Divider()
 
@@ -136,6 +137,7 @@ struct DevManagementApp: App {
                 }
             }
             .frame(width: 520)
+            .background(.thickMaterial)
             .onAppear {
                 monitor.startMonitoring()
             }

@@ -12,28 +12,28 @@ struct ServiceRowView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             // Top row: status indicator, service info, technical details
-            HStack(spacing: 8) {
+            HStack(spacing: 10) {
                 // Status indicator with outline and service icon
                 ZStack {
                     Circle()
                         .fill(healthColor())
-                        .frame(width: 12, height: 12)
-                        .overlay(Circle().stroke(Color.black.opacity(0.15), lineWidth: 0.5))
+                        .frame(width: 14, height: 14)
+                        .overlay(Circle().stroke(Color.black.opacity(0.2), lineWidth: 0.6))
 
                     Text(item.service.icon)
-                        .font(.system(size: 8))
+                        .font(.system(size: 9))
                         .offset(y: 0.5)
                 }
-                .frame(width: 16, height: 16)
+                .frame(width: 18, height: 18)
 
                 // Service name and status (left side)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(item.displayName)
                         .font(.headline)
-                        .foregroundColor(Color(NSColor.labelColor))
+                        .foregroundColor(.primary)
                     Text(item.statusDescription)
                         .font(.caption)
-                        .foregroundColor(Color(NSColor.labelColor))
+                        .foregroundColor(.primary)
                 }
 
                 Spacer()
@@ -43,75 +43,55 @@ struct ServiceRowView: View {
                     if let endpoint = item.endpoint {
                         Text(endpoint)
                             .font(.caption2)
-                            .foregroundColor(Color(NSColor.labelColor))
+                            .foregroundColor(.primary)
                             .lineLimit(1)
                     }
                     if let latency = item.latency_ms, latency > 0 {
                         Text("\(latency) ms")
                             .font(.caption2)
-                            .foregroundColor(Color(NSColor.labelColor))
+                            .foregroundColor(.secondary.opacity(0.9))
                     }
                     if let uptime = item.uptime {
                         Text("up \(uptime)")
                             .font(.caption2)
-                            .foregroundColor(Color(NSColor.labelColor))
+                            .foregroundColor(.secondary.opacity(0.9))
                     }
                 }
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
 
-            // Bottom row: control buttons with enhanced styling
-            HStack(spacing: 4) {
-                Button(action: onStart) {
-                    Text("Start")
-                        .font(.caption2)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color.green.opacity(item.isRunning ? 0.4 : 1.0))
-                        .cornerRadius(4)
-                }
-                .disabled(item.isRunning)
+            // Bottom row: control buttons with bordered style
+            HStack(spacing: 6) {
+                Button("Start", action: onStart)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.green)
+                    .opacity(item.isRunning ? 0.35 : 1.0)
+                    .controlSize(.small)
 
-                Button(action: onStop) {
-                    Text("Stop")
-                        .font(.caption2)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color.red.opacity(!item.isRunning ? 0.4 : 1.0))
-                        .cornerRadius(4)
-                }
-                .disabled(!item.isRunning)
+                Button("Stop", action: onStop)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)
+                    .opacity(!item.isRunning ? 0.35 : 1.0)
+                    .controlSize(.small)
 
-                Button(action: onRestart) {
-                    Text("Restart")
-                        .font(.caption2)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color.blue)
-                        .cornerRadius(4)
-                }
+                Button("Restart", action: onRestart)
+                    .buttonStyle(.bordered)
+                    .tint(.blue)
+                    .controlSize(.small)
 
-                Button(action: onLogs) {
-                    Text("Logs")
-                        .font(.caption2)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color.gray)
-                        .cornerRadius(4)
-                }
+                Button("Logs", action: onLogs)
+                    .buttonStyle(.bordered)
+                    .tint(.gray)
+                    .controlSize(.small)
 
                 Spacer()
             }
-            .padding(.horizontal, 8)
-            .padding(.bottom, 4)
+            .padding(.horizontal, 10)
+            .padding(.bottom, 6)
         }
 
-        Divider()
+        Divider().overlay(Color.primary.opacity(0.08))
     }
 
     private func healthColor() -> Color {

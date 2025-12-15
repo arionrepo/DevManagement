@@ -26,7 +26,7 @@ struct DevManagementApp: App {
                             Image(systemName: "arrow.clockwise")
                                 .font(.system(size: 12, weight: .semibold))
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(.borderedProminent)
                         .tint(.blue)
                         .controlSize(.small)
                         .help("Refresh service status")
@@ -55,7 +55,8 @@ struct DevManagementApp: App {
                     .padding(.vertical, 6)
                     .padding(.horizontal, 8)
                 }
-                .frame(height: 280)
+                .scrollContentBackground(.hidden)
+                .frame(height: 360)
 
                 Divider()
 
@@ -136,8 +137,9 @@ struct DevManagementApp: App {
                     }
                 }
             }
-            .frame(width: 520)
-            .background(.thickMaterial)
+            .frame(minWidth: 520, idealWidth: 560)
+            .frame(maxHeight: 600)
+            .background(Color(NSColor.windowBackgroundColor))
             .onAppear {
                 monitor.startMonitoring()
             }
@@ -153,6 +155,7 @@ struct DevManagementApp: App {
                     .font(.system(size: 11, weight: .semibold))
             }
         }
+        .menuBarExtraStyle(.window)
     }
 
     private func statusColor() -> Color {

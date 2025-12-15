@@ -21,13 +21,84 @@ class ServiceMonitor: ObservableObject {
     func loadServices() {
         do {
             let loadedServices = try configManager.loadServices()
-            self.services = loadedServices.map { service in
-                ServiceStatusItem(service: service, status: nil)
+
+            // Detect colima profiles first
+            let colimaProfiles = detectColimaProfiles()
+            var serviceItems: [ServiceStatusItem] = []
+
+            // Add colima profiles at the top
+            for profile in colimaProfiles {
+                if let profileService = createColimaProfileService(profileName: profile) {
+                    serviceItems.append(ServiceStatusItem(service: profileService, status: nil))
+                }
             }
+
+            // Add other services, filtering out the generic "colima" service
+            for service in loadedServices where service.id != "colima" {
+                serviceItems.append(ServiceStatusItem(service: service, status: nil))
+            }
+
+            self.services = serviceItems
             updateStatus()
         } catch {
             print("❌ Failed to load services: \(error)")
         }
+    }
+
+    private func detectColimaProfiles() -> [String] {
+        let colimaDir = NSHomeDirectory() + "/.colima"
+        let fileManager = FileManager.default
+
+        guard fileManager.fileExists(atPath: colimaDir) else {
+            return []
+        }
+
+        do {
+            let contents = try fileManager.contentsOfDirectory(atPath: colimaDir)
+            // Filter for profile directories (skip _lima, ssh_config, etc.)
+            return contents.filter { item in
+                !item.hasPrefix(".") && !item.hasPrefix("_") && item != "ssh_config"
+            }.sorted()
+        } catch {
+            print("⚠️  Failed to read colima profiles: \(error)")
+            return []
+        }
+    }
+
+    private func createColimaProfileService(profileName: String) -> Service? {
+        // Create a synthetic Service for colima profile monitoring
+        let profileService = Service(
+            id: "colima-\(profileName)",
+            name: "colima-\(profileName)",
+            displayName: "Colima: \(profileName)",
+            type: "process",
+            icon: "🐳",
+            description: "Docker runtime profile: \(profileName)",
+            startupOrder: 100,  // Not in startup order
+            critical: false,
+            startupDelaySeconds: 0,
+            commands: Commands(
+                start: "colima start \(profileName)",
+                stop: "colima stop \(profileName)",
+                restart: "colima stop \(profileName) && colima start \(profileName)",
+                status: "colima status \(profileName)"
+            ),
+            healthCheck: HealthCheck(
+                type: "command",
+                endpoints: nil,
+                command: "colima status \(profileName)",
+                expectedOutputPattern: "running",
+                timeoutSeconds: 5,
+                intervalSeconds: 3,
+                expectedStatusCodes: nil
+            ),
+            ports: nil,
+            files: FileMapping(),
+            dependencies: nil,
+            notes: "Colima profile: \(profileName)",
+            colimaProfile: profileName
+        )
+        return profileService
     }
 
     func startMonitoring() {
@@ -154,5 +225,13 @@ struct ServiceStatusItem {
 
     var uptime: String? {
         status?.uptime
+    }
+
+    var cpus: Int? {
+        status?.cpus
+    }
+
+    var memory_gb: Double? {
+        status?.memory_gb
     }
 }

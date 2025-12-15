@@ -39,6 +39,26 @@ public struct Service: Codable {
     public let files: FileMapping
     public let dependencies: [String]?
     public let notes: String?
+    public let colimaProfile: String?  // Optional: for colima profile services
+
+    public init(id: String, name: String, displayName: String, type: String, icon: String, description: String, startupOrder: Int, critical: Bool, startupDelaySeconds: Int, commands: Commands, healthCheck: HealthCheck?, ports: [PortMapping]?, files: FileMapping, dependencies: [String]?, notes: String?, colimaProfile: String? = nil) {
+        self.id = id
+        self.name = name
+        self.displayName = displayName
+        self.type = type
+        self.icon = icon
+        self.description = description
+        self.startupOrder = startupOrder
+        self.critical = critical
+        self.startupDelaySeconds = startupDelaySeconds
+        self.commands = commands
+        self.healthCheck = healthCheck
+        self.ports = ports
+        self.files = files
+        self.dependencies = dependencies
+        self.notes = notes
+        self.colimaProfile = colimaProfile
+    }
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -56,14 +76,22 @@ public struct Service: Codable {
         case files
         case dependencies
         case notes
+        case colimaProfile = "colima_profile"
     }
 }
 
 public struct Commands: Codable {
-    let start: String
-    let stop: String
-    let restart: String
-    let status: String?
+    public let start: String
+    public let stop: String
+    public let restart: String
+    public let status: String?
+
+    public init(start: String, stop: String, restart: String, status: String? = nil) {
+        self.start = start
+        self.stop = stop
+        self.restart = restart
+        self.status = status
+    }
 }
 
 public struct HealthCheck: Codable {
@@ -74,6 +102,16 @@ public struct HealthCheck: Codable {
     public let timeoutSeconds: Int?
     public let intervalSeconds: Int?
     public let expectedStatusCodes: [Int]?
+
+    public init(type: String, endpoints: [HealthCheckEndpoint]? = nil, command: String? = nil, expectedOutputPattern: String? = nil, timeoutSeconds: Int? = nil, intervalSeconds: Int? = nil, expectedStatusCodes: [Int]? = nil) {
+        self.type = type
+        self.endpoints = endpoints
+        self.command = command
+        self.expectedOutputPattern = expectedOutputPattern
+        self.timeoutSeconds = timeoutSeconds
+        self.intervalSeconds = intervalSeconds
+        self.expectedStatusCodes = expectedStatusCodes
+    }
 
     enum CodingKeys: String, CodingKey {
         case type
@@ -109,6 +147,13 @@ public struct FileMapping: Codable {
     let stopScripts: [FileReference]?
     let configFiles: [FileReference]?
     let relatedFiles: [FileReference]?
+
+    public init(startupScripts: [FileReference]? = nil, stopScripts: [FileReference]? = nil, configFiles: [FileReference]? = nil, relatedFiles: [FileReference]? = nil) {
+        self.startupScripts = startupScripts
+        self.stopScripts = stopScripts
+        self.configFiles = configFiles
+        self.relatedFiles = relatedFiles
+    }
 
     enum CodingKeys: String, CodingKey {
         case startupScripts = "startup_scripts"
@@ -161,11 +206,15 @@ public struct ServiceStatus {
     public let description: String
     public let latency_ms: Int?
     public let uptime: String?
+    public let cpus: Int?
+    public let memory_gb: Double?
 
-    public init(icon: String, description: String, latency_ms: Int? = nil, uptime: String? = nil) {
+    public init(icon: String, description: String, latency_ms: Int? = nil, uptime: String? = nil, cpus: Int? = nil, memory_gb: Double? = nil) {
         self.icon = icon
         self.description = description
         self.latency_ms = latency_ms
         self.uptime = uptime
+        self.cpus = cpus
+        self.memory_gb = memory_gb
     }
 }

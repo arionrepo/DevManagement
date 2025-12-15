@@ -109,6 +109,11 @@ public class ServiceManager {
     // MARK: - Status Checking
 
     private func checkProcessStatus(_ service: Service) throws -> ServiceStatus {
+        // Special handling for colima profile status checks
+        if service.id.hasPrefix("colima-") && service.colimaProfile != nil {
+            return try checkColimaProfileStatus(service)
+        }
+
         let process = Process()
         process.launchPath = "/bin/bash"
         process.arguments = ["-c", service.commands.status ?? "true"]
@@ -122,6 +127,65 @@ public class ServiceManager {
             process.waitUntilExit()
 
             if process.terminationStatus == 0 {
+                return ServiceStatus(icon: "🟢", description: "Running")
+            } else {
+                return ServiceStatus(icon: "🔴", description: "Stopped")
+            }
+        } catch {
+            return ServiceStatus(icon: "🔴", description: "Status check failed")
+        }
+    }
+
+    private func checkColimaProfileStatus(_ service: Service) throws -> ServiceStatus {
+        // Use colima list --json to check profile status and resources
+        let profileName = service.colimaProfile ?? "default"
+
+        let process = Process()
+        process.launchPath = "/bin/bash"
+        process.arguments = ["-c", "colima list --json 2>/dev/null | grep -A 10 '\"name\":\"\(profileName)\"'"]
+
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = pipe
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            if let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines),
+               !output.isEmpty {
+
+                // Parse JSON to extract status and resources
+                if let jsonData = output.data(using: .utf8),
+                   let json = try JSONSerialization.jsonObject(with: jsonData) as? [String: Any] {
+
+                    let status = json["status"] as? String ?? "Unknown"
+                    let cpus = json["cpus"] as? Int
+                    let memory = json["memory"] as? Int
+                    let memoryGb = memory.map { Double($0) / 1_073_741_824 }
+
+                    if status == "Running" {
+                        return ServiceStatus(icon: "🟢", description: "Running", cpus: cpus, memory_gb: memoryGb)
+                    } else {
+                        return ServiceStatus(icon: "🔴", description: "Stopped", cpus: cpus, memory_gb: memoryGb)
+                    }
+                }
+            }
+
+            // Fallback to simple status check
+            let statusProcess = Process()
+            statusProcess.launchPath = "/bin/bash"
+            statusProcess.arguments = ["-c", "colima status \(profileName)"]
+
+            let statusPipe = Pipe()
+            statusProcess.standardOutput = statusPipe
+            statusProcess.standardError = statusPipe
+
+            try statusProcess.run()
+            statusProcess.waitUntilExit()
+
+            if statusProcess.terminationStatus == 0 {
                 return ServiceStatus(icon: "🟢", description: "Running")
             } else {
                 return ServiceStatus(icon: "🔴", description: "Stopped")

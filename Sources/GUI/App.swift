@@ -54,7 +54,7 @@ struct DevManagementApp: App {
                     .padding(.vertical, 6)
                     .padding(.horizontal, 8)
                 }
-                .frame(height: 220)
+                .frame(height: 280)
 
                 Divider()
 
@@ -135,7 +135,7 @@ struct DevManagementApp: App {
                     }
                 }
             }
-            .frame(width: 360)
+            .frame(width: 520)
             .onAppear {
                 monitor.startMonitoring()
             }
@@ -185,11 +185,45 @@ struct DevManagementApp: App {
     }
 
     private func openLogs(for service: Service) {
-        // Try to open logs in default application
-        // For now, just print the service name as we don't have log paths configured
-        print("📋 Opening logs for \(service.displayName)...")
+        // Determine log path based on service type
+        var logPath: String? = nil
 
-        // TODO: Implement log path detection based on service type
-        // and open with NSWorkspace.shared.open()
+        switch service.id {
+        case "colima":
+            // Colima logs are in ~/.colima
+            let colimaDir = NSHomeDirectory() + "/.colima"
+            if FileManager.default.fileExists(atPath: colimaDir) {
+                logPath = colimaDir
+            }
+
+        case "supabase":
+            // Supabase logs in the configured log directory
+            logPath = "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/logs"
+
+        case "python-backend":
+            // Python backend logs
+            logPath = "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/logs"
+
+        case "admin-ui":
+            // Admin UI logs
+            logPath = "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/logs"
+
+        case "customer-ui":
+            // Customer UI logs
+            logPath = "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/logs"
+
+        default:
+            // Default to general logs directory
+            logPath = "/Users/liborballaty/LocalProjects/GitHubProjectsDocuments/xLLMArionComply/arioncomply-v1/logs"
+        }
+
+        // Open the log directory with default application (Finder)
+        if let logPath = logPath, FileManager.default.fileExists(atPath: logPath) {
+            let url = URL(fileURLWithPath: logPath)
+            NSWorkspace.shared.open(url)
+            print("📋 Opened logs for \(service.displayName): \(logPath)")
+        } else {
+            print("⚠️  Log directory not found for \(service.displayName)")
+        }
     }
 }

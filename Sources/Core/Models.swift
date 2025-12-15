@@ -67,13 +67,13 @@ public struct Commands: Codable {
 }
 
 public struct HealthCheck: Codable {
-    let type: String
-    let endpoints: [HealthCheckEndpoint]?
-    let command: String?
-    let expectedOutputPattern: String?
-    let timeoutSeconds: Int?
-    let intervalSeconds: Int?
-    let expectedStatusCodes: [Int]?
+    public let type: String
+    public let endpoints: [HealthCheckEndpoint]?
+    public let command: String?
+    public let expectedOutputPattern: String?
+    public let timeoutSeconds: Int?
+    public let intervalSeconds: Int?
+    public let expectedStatusCodes: [Int]?
 
     enum CodingKeys: String, CodingKey {
         case type
@@ -87,9 +87,9 @@ public struct HealthCheck: Codable {
 }
 
 public struct HealthCheckEndpoint: Codable {
-    let url: String
-    let expectedStatusCodes: [Int]?
-    let description: String?
+    public let url: String
+    public let expectedStatusCodes: [Int]?
+    public let description: String?
 
     enum CodingKeys: String, CodingKey {
         case url
@@ -159,9 +159,13 @@ public struct FutureService: Codable {
 public struct ServiceStatus {
     public let icon: String
     public let description: String
+    public let latency_ms: Int?
+    public let uptime: String?
 
-    public init(icon: String, description: String) {
+    public init(icon: String, description: String, latency_ms: Int? = nil, uptime: String? = nil) {
         self.icon = icon
         self.description = description
+        self.latency_ms = latency_ms
+        self.uptime = uptime
     }
 }

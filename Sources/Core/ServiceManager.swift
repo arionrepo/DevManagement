@@ -189,14 +189,17 @@ public class ServiceManager {
 
         var resultStatus: ServiceStatus? = nil
         let semaphore = DispatchSemaphore(value: 0)
+        let startTime = Date()
 
         let task = session.dataTask(with: request) { _, response, _ in
+            let latency = Int((Date().timeIntervalSince(startTime)) * 1000)
+
             if let httpResponse = response as? HTTPURLResponse {
                 let expectedCodes = endpoint.expectedStatusCodes ?? [200]
                 if expectedCodes.contains(httpResponse.statusCode) {
-                    resultStatus = ServiceStatus(icon: "🟢", description: "Healthy")
+                    resultStatus = ServiceStatus(icon: "🟢", description: "Healthy", latency_ms: latency)
                 } else {
-                    resultStatus = ServiceStatus(icon: "🟠", description: "HTTP \(httpResponse.statusCode)")
+                    resultStatus = ServiceStatus(icon: "🟠", description: "HTTP \(httpResponse.statusCode)", latency_ms: latency)
                 }
             }
             semaphore.signal()

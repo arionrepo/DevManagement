@@ -39,12 +39,16 @@ struct DevManagementApp: App {
 
                 // MARK: - Services List
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 5) {
+                    VStack(alignment: .leading, spacing: 0) {
                         ForEach(0..<monitor.services.count, id: \.self) { index in
                             let item = monitor.services[index]
-                            ServiceRowView(item: item) {
-                                monitor.restart(service: item.service)
-                            }
+                            ServiceRowView(
+                                item: item,
+                                onStart: { monitor.start(service: item.service) },
+                                onStop: { monitor.stop(service: item.service) },
+                                onRestart: { monitor.restart(service: item.service) },
+                                onLogs: { openLogs(for: item.service) }
+                            )
                         }
                     }
                     .padding(.vertical, 6)
@@ -178,5 +182,14 @@ struct DevManagementApp: App {
         for service in monitor.services {
             monitor.stop(service: service.service)
         }
+    }
+
+    private func openLogs(for service: Service) {
+        // Try to open logs in default application
+        // For now, just print the service name as we don't have log paths configured
+        print("📋 Opening logs for \(service.displayName)...")
+
+        // TODO: Implement log path detection based on service type
+        // and open with NSWorkspace.shared.open()
     }
 }

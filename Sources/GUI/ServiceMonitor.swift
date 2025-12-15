@@ -134,4 +134,25 @@ struct ServiceStatusItem {
     var statusDescription: String {
         status?.description ?? "Loading..."
     }
+
+    var isRunning: Bool {
+        status?.icon == "🟢"
+    }
+
+    var endpoint: String? {
+        if let healthCheck = service.healthCheck,
+           let endpoints = healthCheck.endpoints,
+           !endpoints.isEmpty {
+            return endpoints.first?.url
+        }
+        return nil
+    }
+
+    var latency_ms: Int? {
+        status?.latency_ms
+    }
+
+    var uptime: String? {
+        status?.uptime
+    }
 }

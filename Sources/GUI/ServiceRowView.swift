@@ -1,61 +1,82 @@
 import SwiftUI
 import DevManagementCore
 
-/// Individual service row component for the menu bar dropdown
+/// Individual service row component for the menu bar dropdown - Information-dense layout
 struct ServiceRowView: View {
     let item: ServiceStatusItem
+    let onStart: () -> Void
+    let onStop: () -> Void
     let onRestart: () -> Void
-
-    var backgroundColor: Color {
-        switch item.icon {
-        case "🟢":
-            return Color(nsColor: NSColor(red: 0.95, green: 1.0, blue: 0.95, alpha: 1.0))
-        case "🟠":
-            return Color(nsColor: NSColor(red: 1.0, green: 0.97, blue: 0.92, alpha: 1.0))
-        case "🔴":
-            return Color(nsColor: NSColor(red: 1.0, green: 0.93, blue: 0.93, alpha: 1.0))
-        default:
-            return Color(nsColor: .controlBackgroundColor)
-        }
-    }
+    let onLogs: () -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
-            // Large status icon
-            Text(item.icon)
-                .font(.system(size: 20))
-                .frame(width: 28, alignment: .center)
+        VStack(alignment: .leading, spacing: 4) {
+            // Top row: status indicator, service info, technical details
+            HStack {
+                // Small status circle
+                Circle()
+                    .fill(healthColor())
+                    .frame(width: 10, height: 10)
 
-            // Service info
-            VStack(alignment: .leading, spacing: 3) {
-                Text(item.displayName)
-                    .font(.system(.body, design: .default))
-                    .fontWeight(.semibold)
-                    .lineLimit(1)
+                // Service name and status
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(item.displayName)
+                        .font(.headline)
+                    Text(item.statusDescription)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
 
-                Text(item.statusDescription)
-                    .font(.system(size: 12, weight: .regular))
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
+                Spacer()
+
+                // Technical details (right-aligned)
+                VStack(alignment: .trailing, spacing: 2) {
+                    if let endpoint = item.endpoint {
+                        Text(endpoint)
+                            .font(.caption)
+                    }
+                    if let latency = item.latency_ms, latency > 0 {
+                        Text("\(latency) ms")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    if let uptime = item.uptime {
+                        Text("up \(uptime)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
             }
+            .padding(.horizontal, 8)
 
-            Spacer()
-
-            // Restart button
-            Button(action: onRestart) {
-                Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.blue)
+            // Bottom row: control buttons
+            HStack(spacing: 6) {
+                Button("Start") { onStart() }
+                    .disabled(item.isRunning)
+                Button("Stop") { onStop() }
+                    .disabled(!item.isRunning)
+                Button("Restart") { onRestart() }
+                Button("Logs") { onLogs() }
+                Spacer()  // Push buttons to left
             }
-            .buttonStyle(.plain)
-            .help("Restart \(item.displayName)")
-            .padding(.trailing, 4)
+            .buttonStyle(.borderless)
+            .font(.caption)
+            .padding(.leading, 18)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(backgroundColor)
-        )
+
+        Divider()
+    }
+
+    private func healthColor() -> Color {
+        switch item.icon {
+        case "🟢":
+            return .green
+        case "🟠":
+            return .orange
+        case "🔴":
+            return .red
+        default:
+            return .gray
+        }
     }
 }
